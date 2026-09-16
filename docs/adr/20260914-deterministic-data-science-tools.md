@@ -1,4 +1,4 @@
-# ADR-004: Deterministic Data Science Tools
+# Deterministic Data Science Tools
 
 - Status: Accepted
 - Date: 2026-09-14

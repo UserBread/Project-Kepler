@@ -1,4 +1,4 @@
-# ADR-006: Reproducibility and Experiment Tracking
+# Reproducibility and Experiment Tracking
 
 - Status: Accepted
 - Date: 2026-09-14

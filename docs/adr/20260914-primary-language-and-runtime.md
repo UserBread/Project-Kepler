@@ -1,4 +1,4 @@
-# ADR-002: Primary Language and Runtime
+# Primary Language and Runtime
 
 - Status: Accepted
 - Date: 2026-09-14

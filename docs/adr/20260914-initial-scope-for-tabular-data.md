@@ -1,4 +1,4 @@
-# ADR-001: Initial Scope for Tabular Data
+# Initial Scope for Tabular Data
 
 - Status: Accepted
 - Date: 2026-09-14

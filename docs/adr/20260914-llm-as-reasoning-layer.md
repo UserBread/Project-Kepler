@@ -1,4 +1,4 @@
-# ADR-003: LLM as Reasoning Layer
+# LLM as Reasoning Layer
 
 - Status: Accepted
 - Date: 2026-09-14

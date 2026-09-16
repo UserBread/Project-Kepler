@@ -1,4 +1,4 @@
-# ADR-005: Agent Orchestration
+# Agent Orchestration
 
 - Status: Accepted
 - Date: 2026-09-14
