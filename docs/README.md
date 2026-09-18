@@ -2,7 +2,7 @@
 
 ## Decisions
 
-See `decisions/` for Architecture Decision Records.
+See `adr/` for Architecture Decision Records.
 
 ## Architecture
 
