@@ -1,14 +1,13 @@
-# LLM as Reasoning Layer
+# ADR-003: LLM as Reasoning Layer
 
-- Status: Accepted
-- Date: 2026-09-14
-- Tags: llm, reasoning, architecture, determinism
+- **Status:** Accepted
+- **Date:** 2026-09-18
 
-## Context and Problem Statement
+## Context
 
-Kepler needs to combine language-model reasoning with deterministic data-science operations. LLMs are strong at understanding natural-language questions, generating hypotheses, selecting approaches, and interpreting results, but they are not reliable numerical computation engines and can produce unsupported or incorrect statistical conclusions.
+LLMs are useful for natural-language reasoning, planning and interpretation but can produce incorrect numerical or statistical claims.
 
-If the LLM were allowed to independently calculate statistical results, the system would become much harder to evaluate, audit, and reproduce.
+Kepler needs both flexible reasoning and reliable computation.
 
 ## Decision Drivers
 
@@ -17,78 +16,77 @@ If the LLM were allowed to independently calculate statistical results, the syst
 - The agent must plan and interpret investigations without becoming a source of truth for results.
 - The architecture should separate reasoning from computation.
 
-## Considered Options
+## Decision
 
-- LLM-only analysis
-- Fully deterministic pipeline
-- LLM-generated Python execution
-- LLM as reasoning layer over deterministic tools
-
-## Decision Outcome
-
-Chosen option: "LLM as reasoning layer over deterministic tools", because it preserves the agent's ability to plan and interpret while ensuring all numerical and statistical outputs come from validated software components.
+The LLM will act as the reasoning and orchestration layer rather than the numerical source of truth.
 
 The LLM is responsible for:
 
-- Understanding user questions
+- Understanding questions
 - Planning investigations
-- Selecting tools and workflows
+- Selecting tools
 - Generating hypotheses
-- Interpreting analysis results
-- Critiquing prior steps
-- Deciding whether more investigation is needed
-- Producing natural-language explanations
+- Interpreting results
+- Critiquing findings
+- Producing explanations
 
-Deterministic software components remain responsible for:
+Deterministic software is responsible for:
 
-- Statistical calculations
 - Data manipulation
-- Model training and evaluation
+- Statistical calculations
+- Model training
 - Metric calculation
-- Data validation
-- Visualisation generation
+- Validation
+- Visualisation
 - Experiment recording
+
+## Core Principle
 
 > The LLM decides what should be done; deterministic tools determine what the data says.
 
-### Positive Consequences
+## Alternatives Considered
 
-- Improved numerical reliability and reproducibility.
-- Easier evaluation of analytical correctness.
-- Clear separation between reasoning and computation.
-- Individual tools can be tested independently.
-- Different LLMs can be benchmarked without changing the analytical engine.
+### LLM-generated Python
 
-### Negative Consequences
-
-- Requires a substantial deterministic tool layer.
-- Adds architectural complexity compared with unrestricted direct code generation.
-- The LLM may still misinterpret correct results.
-- Tool interfaces must be carefully designed and maintained.
-
-## Pros and Cons of the Options
+Rejected as the default because arbitrary generated code is harder to validate, constrain and reproduce.
 
 ### LLM-only analysis
 
-- Good, because it is simple and conversational.
-- Bad, because it is not reliable for data science and statistics.
+Rejected because numerical correctness and statistical reliability cannot depend solely on language-model output.
 
 ### Fully deterministic pipeline
 
-- Good, because it is reproducible and easier to validate.
-- Bad, because it does not meaningfully investigate autonomous reasoning or adaptive workflow selection.
-
-### LLM-generated Python execution
-
-- Good, because it may be flexible and expressive.
-- Bad, because it introduces security, reproducibility, and validation challenges.
+Rejected because it would not investigate the autonomous reasoning question central to Kepler.
 
 ### LLM as reasoning layer over deterministic tools
 
-- Good, because it enables adaptive reasoning while preserving computational integrity.
-- Good, because it creates a clean separation between decision-making and execution.
-- Bad, because it requires more infrastructure and disciplined interface design.
+Enables adaptive reasoning while preserving computational integrity.
+
+## Consequences
+
+### Positive
+
+- Better numerical reliability
+- Explicit separation of reasoning and computation
+- Easier auditing
+- Easier testing
+- Clearer research comparisons
+- Improved numerical reliability and reproducibility.
+- Individual tools can be tested independently.
+- Different LLMs can be benchmarked without changing the analytical engine.
+
+### Negative
+
+- More engineering effort
+- Tool interfaces must be designed carefully
+- Some analytical flexibility is constrained by available tools
+- The LLM may still misinterpret correct results.
+- Tool interfaces must be carefully designed and maintained.
 
 ## Links
 
-- This ADR underpins the deterministic tool architecture in [ADR-004](ADR-004%20—%20Deterministic%20Data%20Science%20Tools.md).
+- This ADR underpins the deterministic tool architecture described in [Deterministic Data Science Tools](20260914-deterministic-data-science-tools.md).
+
+## Reconsideration
+
+Sandboxed code generation may be evaluated later as an experimental capability, but it must have explicit safety and evaluation boundaries.

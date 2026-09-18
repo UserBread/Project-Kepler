@@ -1,14 +1,13 @@
-# Agent Orchestration
+# ADR-005: Agent Orchestration
 
-- Status: Accepted
-- Date: 2026-09-14
-- Tags: orchestration, langgraph, workflow, agents
+- **Status:** Accepted
+- **Date:** 2026-09-18
 
-## Context and Problem Statement
+## Context
 
-Kepler is designed to execute multi-step investigations, not merely answer a single prompt. An investigation may involve understanding a user question, inspecting a dataset, forming hypotheses, choosing analyses, running tools, reviewing results, identifying weaknesses, and repeating the cycle until a final report is produced.
+Kepler needs to represent stateful analytical workflows involving planning, tool execution, observations, critique and potentially repeated iterations.
 
-This requires persistent state, conditional branching, loops, error handling, and eventually specialised agents. A simple request/response pattern would become difficult to manage as the workflow becomes more autonomous.
+A simple linear chain will become insufficient once autonomous iteration is introduced.
 
 ## Decision Drivers
 
@@ -17,56 +16,81 @@ This requires persistent state, conditional branching, loops, error handling, an
 - The system may eventually benefit from specialist agents or task decomposition.
 - Tool execution needs observability and controlled branching.
 
-## Considered Options
+## Decision
 
-- Custom orchestration layer
-- Simple Python control flow
-- Other agent frameworks
-- LangGraph-based orchestration
+LangGraph will be used for stateful agent orchestration.
 
-## Decision Outcome
+Kepler will initially implement a single-agent workflow and add specialist agents only when justified by evaluation.
 
-Chosen option: "LangGraph-based orchestration", because it provides explicit workflow representation, stateful execution, and conditional transitions suitable for iterative scientific investigations.
+The workflow will support planning, tool selection, execution, observation and re-planning.
 
-The system will initially use a single agent and will only introduce additional specialised roles when justified by project requirements. The workflow will support planning, tool selection, execution, observation, and re-planning.
+## Initial Workflow
 
-### Positive Consequences
+```text
+Question
+  ↓
+Plan
+  ↓
+Tool
+  ↓
+Observation
+  ↓
+Decision
+  ↓
+Finish / Continue
+```
 
-- Explicit representation of investigation steps.
-- Persistent state across workflow execution.
-- Conditional branching and iterative reasoning.
-- Clear support for future multi-agent patterns.
-- Better observability of agent behaviour and workflow decisions.
+Later:
 
-### Negative Consequences
+```text
+Plan
+  ↓
+Analyse
+  ↓
+Critique
+  ↓
+Pass / Re-plan
+```
 
-- Adds another framework dependency to the stack.
-- The abstraction may be unnecessary for very simple workflows.
-- Requires understanding of graph-based workflow design and debugging.
-
-## Pros and Cons of the Options
+## Alternatives Considered
 
 ### Custom orchestration
 
-- Good, because it can be tailored precisely to the project.
-- Bad, because it would require substantial time and complexity to implement reliable state management and workflows.
+Would provide maximum control but introduce unnecessary infrastructure before the workflow is understood.
 
-### Simple Python control flow
+### Simple sequential chains
 
-- Good, because it is straightforward for early prototypes.
-- Bad, because it becomes harder to maintain as workflows become nested, iterative, and multi-step.
+Insufficient for conditional branching and iterative investigation.
+
+### Multi-agent from the beginning
+
+Rejected because it introduces complexity before demonstrating that multiple agents provide measurable value.
 
 ### Other agent frameworks
 
-- Good, because they may offer different strengths and abstractions.
-- Bad, because there is no immediate evidence that a different framework is necessary.
+May offer different strengths, but there is no immediate evidence that another framework is necessary.
 
-### LangGraph-based orchestration
+## Consequences
 
-- Good, because it supports stateful, graph-based workflow management.
-- Good, because it provides a natural foundation for multi-agent or specialist workflows.
-- Bad, because it adds a framework dependency and learning curve.
+### Positive
 
-## Links
+- Explicit workflow state
+- Conditional transitions
+- Iteration
+- Checkpointing potential
+- Natural path to multi-agent workflows
+- Explicit representation of investigation steps
+- Persistent state across workflow execution
+- Better observability of agent behaviour and workflow decisions
 
-- This decision integrates with the LLM reasoning pattern in [ADR-003](ADR-003%20—%20LLM%20as%20Reasoning%20Layer.md).
+### Negative
+
+- Additional framework dependency
+- Workflow design becomes an explicit engineering concern
+- Adds a framework dependency and learning curve.
+- The abstraction may be unnecessary for very simple workflows.
+- Requires understanding of graph-based workflow design and debugging.
+
+## Reconsideration
+
+The orchestration framework may be changed if it becomes a limitation or if evaluation demonstrates that simpler orchestration is preferable.

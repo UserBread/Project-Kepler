@@ -1,14 +1,13 @@
-# Deterministic Data Science Tools
+# ADR-004: Deterministic Analytical Tools
 
-- Status: Accepted
-- Date: 2026-09-14
-- Tags: tools, analytics, determinism, architecture
+- **Status:** Accepted
+- **Date:** 2026-09-18
 
-## Context and Problem Statement
+## Context
 
-Kepler must execute data-science operations based on decisions made by an AI agent. If the agent directly performs calculations or manipulates analysis logic, then correctness becomes difficult to test, audit, and reproduce.
+Kepler requires the LLM to interact with data-science functionality without allowing the reasoning model to become the computational authority.
 
-The system therefore needs a contract-based tool layer in which every analytical operation has explicitly defined inputs, outputs, validation, and provenance.
+If the agent directly performs calculations or manipulates analysis logic, correctness becomes difficult to test, audit and reproduce. Each analytical operation therefore needs explicitly defined inputs, outputs, validation and provenance.
 
 ## Decision Drivers
 
@@ -17,26 +16,29 @@ The system therefore needs a contract-based tool layer in which every analytical
 - Individual analysis operations must be independently verified.
 - Tool outputs should be suitable as evidence for downstream reasoning and reporting.
 
-## Considered Options
+## Decision
 
-- Arbitrary Python execution
-- Monolithic analysis engine
-- Deterministic tool-based analytical layer
+Analytical capabilities will be exposed through explicit deterministic tools with defined contracts.
 
-## Decision Outcome
+Initial tool categories:
 
-Chosen option: "Deterministic tool-based analytical layer", because it provides a clear contract for each operation, allows independent testing, and preserves auditability and reproducibility across investigations.
+- Dataset tools
+- Profiling tools
+- Statistical tools
+- Machine-learning tools
+- Visualisation tools
+- Experiment tools
 
-Initial tool categories will include:
+Initial capabilities include:
 
-### Dataset Tools
+### Dataset tools
 
 - Load dataset
 - Inspect dataset
 - Inspect column
 - Retrieve dataset metadata
 
-### Profiling Tools
+### Profiling tools
 
 - Profile dataset
 - Analyse missing values
@@ -44,14 +46,14 @@ Initial tool categories will include:
 - Detect outliers
 - Analyse categorical variables
 
-### Statistical Tools
+### Statistical tools
 
 - Calculate correlation
 - Run hypothesis test
 - Compare groups
 - Analyse categorical relationships
 
-### Machine Learning Tools
+### Machine-learning tools
 
 - Prepare dataset
 - Train model
@@ -60,53 +62,87 @@ Initial tool categories will include:
 - Generate predictions
 - Detect anomalies
 
-### Visualisation Tools
+### Visualisation tools
 
 - Generate distribution plot
 - Generate correlation plot
 - Generate scatter plot
 - Generate categorical plot
 
-Each tool will define:
+Each tool should define:
 
-- Required inputs
-- Optional inputs
-- Output structure
-- Validation rules
+- Name
+- Purpose
+- Input schema
+- Output schema
+- Validation
+- Errors
+- Side effects
+- Reproducibility requirements
 - Failure modes and errors
 
-### Positive Consequences
+## Alternatives Considered
 
+### Arbitrary Python execution
+
+Flexible and easy to prototype, but weakens reproducibility, security and observability.
+
+### Monolithic analysis engine
+
+Simple initially, but couples capabilities and makes independent testing and debugging harder.
+
+### Deterministic tool-based analytical layer
+
+Makes operations explicit and auditable, with each tool validated in isolation.
+
+## Example
+
+```text
+calculate_correlation
+
+Input:
+    column_a
+    column_b
+    method
+
+Output:
+    coefficient
+    p_value
+    sample_size
+    confidence_interval
+    warnings
+```
+
+## Rationale
+
+Explicit contracts improve:
+
+- Validation
+- Testing
+- Observability
+- Reproducibility
+- Agent reliability
+
+## Consequences
+
+### Positive
+
+- Controlled agent capabilities
+- Easier testing
+- Structured evidence
+- Reduced dependence on arbitrary generated code
 - Individual components can be tested independently.
 - Tool execution can be logged and audited.
 - Results can be tied to specific experiments and investigations.
 - The LLM cannot arbitrarily redefine analytical operations.
 - Tool results provide clear evidence for generated conclusions.
 
-### Negative Consequences
+### Negative
 
-- Requires more initial engineering work.
-- Tool interfaces must be maintained as the system grows.
+- New analytical capabilities require new tools
+- Tool schemas require maintenance
 - Highly specialised tasks may require additional tool definitions.
 
-## Pros and Cons of the Options
+## Reconsideration
 
-### Arbitrary Python execution
-
-- Good, because it is flexible and easy to prototype.
-- Bad, because it weakens reproducibility, security, and observability.
-
-### Monolithic analysis engine
-
-- Good, because it is conceptually simple at first.
-- Bad, because it couples capabilities and makes independent testing and debugging harder.
-
-### Deterministic tool-based analytical layer
-
-- Good, because it makes operations explicit and auditable.
-- Good, because each tool can be validated in isolation.
-- Bad, because it requires more upfront design and maintenance effort.
-
-## Links
-
-- This decision operationalises the reasoning boundary described in [ADR-003](ADR-003%20—%20LLM%20as%20Reasoning%20Layer.md).
+Arbitrary code execution can be investigated separately if benchmark evidence shows that fixed tools prevent useful analyses.
